@@ -15,11 +15,13 @@ document.addEventListener("DOMContentLoaded", function(){
     let current = document.querySelector('.current')
 
     numbers.forEach((number) => number.addEventListener('click', function(e){
+        
         findNumber(e.target.textContent)
         current.textContent = currentValue
     }))
 
     operators.forEach((op)=> op.addEventListener('click', function(e){
+        
         findOperator(e.target.textContent)
         previous.textContent = previousValue + " " + operator
         current.textContent = currentValue
@@ -31,6 +33,14 @@ document.addEventListener("DOMContentLoaded", function(){
         previous.textContent = previousValue
         current.textContent = currentValue
     })
+    equal.addEventListener('click', function(){
+        calculate()
+        previous.textContent = ''
+        current.textContent = previousValue
+    })
+    decimal.addEventListener('click', function(){
+        findDecimal()
+    })
 })
 
 function findNumber(num){
@@ -41,4 +51,36 @@ function findOperator(op){
     operator = op
     previousValue = currentValue
     currentValue = ''
+}
+
+function calculate(){
+    previousValue = Number(previousValue)
+    currentValue = Number(currentValue)
+
+    if(operator === "+"){
+        previousValue += currentValue
+       currentValue = previousValue
+    }else if(operator === "-"){
+        previousValue -= currentValue
+        currentValue = previousValue
+    }else if(operator === "x"){
+        previousValue *= currentValue
+        currentValue = previousValue
+    }else if(operator === "/"){
+        previousValue /= currentValue
+        currentValue = previousValue
+    }
+
+    previousValue = roundNumber(previousValue)
+ 
+}
+
+function roundNumber(num){
+    return Math.round(num * 100000) / 100000
+}
+
+function findDecimal(){
+    if(!currentValue.includes('.')){
+        currentValue += '.'
+    }
 }
