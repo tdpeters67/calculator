@@ -14,15 +14,23 @@ body{
 .outputScreen{
     width: 275px;
     border: 1px solid white;
-    height: 75px;
+    height: 76px;
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    overflow: auto;
 }
 .previous{
     font-size: 20px;
     color: white;
+    height: 38px;
+    
+
 }
 .current{
     font-size: 30px;
     color: white;
+    height: 38px;
 }
 .firstRow{
     display: flex;
