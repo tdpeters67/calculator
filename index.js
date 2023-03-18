@@ -1,6 +1,7 @@
 let operator = ''
 let previousValue = ''
 let currentValue = ''
+let answerValue = ''
 
 document.addEventListener("DOMContentLoaded", function(){
 
@@ -15,7 +16,6 @@ document.addEventListener("DOMContentLoaded", function(){
     let current = document.querySelector('.current')
 
     numbers.forEach((number) => number.addEventListener('click', function(e){
-        
         findNumber(e.target.textContent)
         current.textContent = currentValue
     }))
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function(){
     equal.addEventListener('click', function(){
         calculate()
         previous.textContent = ''
-        current.textContent = previousValue
+        current.textContent = answerValue
     })
     decimal.addEventListener('click', function(){
         findDecimal()
@@ -44,33 +44,49 @@ document.addEventListener("DOMContentLoaded", function(){
 })
 
 function findNumber(num){
-    currentValue += num;
+    if(answerValue === ""){
+        currentValue += num
+    }else{
+        answerValue = ""
+        currentValue += num
+    }
+    console.log(currentValue)
+    console.log(answerValue)
 }
 
 function findOperator(op){
     operator = op
-    previousValue = currentValue
-    currentValue = ''
-}
+    if(answerValue === ""){
+        previousValue = currentValue
+        currentValue = ""
+    }else{
+        previousValue = answerValue
+        currentValue = ''
+}}
 
 function calculate(){
     previousValue = Number(previousValue)
     currentValue = Number(currentValue)
+    answerValue = Number(answerValue)
 
     if(operator === "+"){
-        previousValue += currentValue
-       currentValue = previousValue
+        answerValue = previousValue + currentValue
+       currentValue = ""
+       operator = ""
     }else if(operator === "-"){
-        previousValue -= currentValue
-        currentValue = previousValue
+        answerValue = previousValue - currentValue
+        currentValue = ""
+        operator = ""
     }else if(operator === "x"){
-        previousValue *= currentValue
-        currentValue = previousValue
+        answerValue = previousValue * currentValue
+        currentValue = ""
+        operator = ""
     }else if(operator === "/"){
-        previousValue /= currentValue
-        currentValue = previousValue
+        answerValue = previousValue / currentValue
+        currentValue = ""
+        operator = ""
     }
-
+console.log(operator)
     previousValue = roundNumber(previousValue)
  
 }
