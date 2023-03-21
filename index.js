@@ -1,102 +1,155 @@
+let currentNumber = ''
+let previousNumber = ''
 let operator = ''
-let previousValue = ''
-let currentValue = ''
-let answerValue = ''
 
-document.addEventListener("DOMContentLoaded", function(){
+const currentDisplayNumber = document.querySelector('.current')
+const previousDisplayNumber = document.querySelector('.previous')
 
-    let clear = document.querySelector('#clrBtn');
-    let equal = document.querySelector('.equal')
-    let decimal = document.querySelector('.decimal')
+window.addEventListener('keydown', findKeyPress)
 
-    let numbers = document.querySelectorAll('.number')
-    let operators = document.querySelectorAll('.operator')
-
-    let previous = document.querySelector('.previous')
-    let current = document.querySelector('.current')
-
-    numbers.forEach((number) => number.addEventListener('click', function(e){
-        findNumber(e.target.textContent)
-        current.textContent = currentValue
-    }))
-
-    operators.forEach((op)=> op.addEventListener('click', function(e){
-        
-        findOperator(e.target.textContent)
-        previous.textContent = previousValue + " " + operator
-        current.textContent = currentValue
-    }))
-    clear.addEventListener('click', function(){
-        previousValue = ''
-        currentValue = ''
-        operator = ''
-        previous.textContent = previousValue
-        current.textContent = currentValue
-    })
-    equal.addEventListener('click', function(){
+const equal = document.querySelector(".equal");
+equal.addEventListener("click", () => {
+    if (currentNumber != "" && previousNumber != ""){
         calculate()
-        previous.textContent = ''
-        current.textContent = answerValue
-    })
-    decimal.addEventListener('click', function(){
-        findDecimal()
+    }
+})
+const decimal = document.querySelector(".decimal");
+decimal.addEventListener("click", () => {
+    findDecimal();
+  });
+
+const clear = document.querySelector(".clear");
+clear.addEventListener("click", allClear);
+
+const numberButtons = document.querySelectorAll(".number");
+const operators = document.querySelectorAll(".operator");
+
+numberButtons.forEach(button => {
+    button.addEventListener('click', (e) =>{
+        findNumber(e.target.textContent)
     })
 })
 
-function findNumber(num){
-    if(answerValue === ""){
-        currentValue += num
-    }else{
-        answerValue = ""
-        currentValue += num
-    }
-    console.log(currentValue)
-    console.log(answerValue)
+function findNumber(number){
+    currentNumber += number
+    currentDisplayNumber.textContent = currentNumber
 }
 
+operators.forEach((button) => {
+    button.addEventListener('click', (e) => {
+        findOperator(e.target.textContent)
+    })
+})
+
 function findOperator(op){
+  if (previousNumber === ""){
+    previousNumber = currentNumber
+    operatorCheck(op);
+  }  else if (currentNumber === ""){
+    operatorCheck(op)
+  }else{
+    calculate()
     operator = op
-    if(answerValue === ""){
-        previousValue = currentValue
-        currentValue = ""
-    }else{
-        previousValue = answerValue
-        currentValue = ''
+    currentDisplayNumber.textContent = "";
+    previousDisplayNumber.textContent = previousNumber + " " + operator;
+
 }}
 
 function calculate(){
-    previousValue = Number(previousValue)
-    currentValue = Number(currentValue)
-    answerValue = Number(answerValue)
+    previousNumber = Number(previousNumber)
+    currentNumber = Number(currentNumber)
 
-    if(operator === "+"){
-        answerValue = previousValue + currentValue
-       currentValue = ""
-       operator = ""
-    }else if(operator === "-"){
-        answerValue = previousValue - currentValue
-        currentValue = ""
-        operator = ""
-    }else if(operator === "x"){
-        answerValue = previousValue * currentValue
-        currentValue = ""
-        operator = ""
-    }else if(operator === "/"){
-        answerValue = previousValue / currentValue
-        currentValue = ""
-        operator = ""
+    if (operator === "+") {
+        previousNumber += currentNumber;
+      } else if (operator === "-") {
+        previousNumber -= currentNumber;
+      } else if (operator === "x") {
+        previousNumber *= currentNumber;
+      } else if (operator === "/") {
+        if (currentNumber <= 0) {
+          previousNumber = "Error";
+          displayResults();
+          return;
+        }else {previousNumber /= currentNumber;
+      }}
+      previousNumber = roundNumber(previousNumber);
+      previousNumber = previousNumber.toString();
+      displayResults();
     }
-console.log(operator)
-    previousValue = roundNumber(previousValue)
- 
+
+function roundNumber(num) {
+    return Math.round(num * 100000) / 100000;
+}
+      
+function displayResults() {
+    if (previousNumber.length <= 11) {
+        currentDisplayNumber.textContent = previousNumber;
+    } else {
+        currentDisplayNumber.textContent = previousNumber.slice(0, 11) + "...";
+        }
+    previousDisplayNumber.textContent = "";
+    operator = "";
+    currentNumber = "";
 }
 
-function roundNumber(num){
-    return Math.round(num * 100000) / 100000
-}
-
-function findDecimal(){
-    if(!currentValue.includes('.')){
-        currentValue += '.'
+function findDecimal() {
+    if (!currentNumber.includes(".")) {
+        currentNumber += ".";
+        currentDisplayNumber.textContent = currentNumber;
     }
 }
+      
+function allClear(){
+    currentNumber = ''
+    previousNumber = ''
+    operator = ''
+    currentDisplayNumber.textContent = "0"
+    previousDisplayNumber.textContent = ""
+}
+
+    
+
+function findKeyPress(e) {
+e.preventDefault();
+ if (e.key >= 0 && e.key <= 9) {
+    findNumber(e.key);
+ }
+ if ( e.key === "Enter" ||
+    ( e.key === "=" && currentNumber != "" && previousNumber != "")) {
+      calculate();
+    }
+    if (e.key === "+" || e.key === "-" || e.key === "/") {
+      findOperator(e.key);
+    }
+    if (e.key === "*") {
+      findOperator("x");
+    }
+    if (e.key === ".") {
+      findDecimal();
+    }
+    if (e.key === "Backspace") {
+      findDelete();
+    }
+  }
+  
+
+function findDelete() {
+  if (currentNumber !== "") {
+    currentNumber = currentNumber.slice(0, -1);
+    currentDisplayNumber.textContent = currentNumber;
+    if (currentNumber === "") {
+      currentDisplayNumber.textContent = "0";
+    }
+  }
+  if (currentNumber === "" && previousNumber !== "" && operator === "") {
+    previousNumber = previousNumber.slice(0, -1);
+    currentDisplayNumber.textContent = previousNumber;
+  }
+}
+
+function operatorCheck(text) {
+    operator = text;
+    previousDisplayNumber.textContent = previousNumber + " " + operator;
+    currentDisplayNumber.textContent = "";
+    currentNumber = "";
+  }
